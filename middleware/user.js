@@ -1,11 +1,13 @@
 const { User } = require("../db/index");
+require("dotenv").config();
+const jwt = require("jsonwebtoken");
+const jwtPassword = process.env.JWT_SECRET;
 
 function userMiddleware(req, res, next) {
-  const { username, password } = req.headers;
-  // console.log(username, password);
+  const token = req.headers.authorization;
+  const decodedValue = jwt.verify(token, jwtPassword);
   const user = User.findOne({
-    username,
-    password,
+    username: decodedValue.username
   });
   user.then((value) => {
     if (value) {

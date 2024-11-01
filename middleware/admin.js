@@ -1,11 +1,15 @@
 const { Admin } = require("../db/index");
+require("dotenv").config();
+const jwt = require("jsonwebtoken");
+const jwtPassword = process.env.JWT_SECRET;
 
 function adminMiddleware(req, res, next) {
-  const { username, password } = req.headers;
-  // console.log(username, password);
+  const token = req.headers.authorization;
+  const decodedValue = jwt.verify(token, jwtPassword);
+  //   console.log(decodedValue.username);
+
   const admin = Admin.findOne({
-    username,
-    password,
+    username: decodedValue.username,
   });
   admin.then((value) => {
     if (value) {

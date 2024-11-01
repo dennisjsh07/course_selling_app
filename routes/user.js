@@ -1,6 +1,9 @@
 const { Router } = require("express");
 const { User, Course } = require("../db/index");
 const userMiddleware = require("../middleware/user");
+require('dotenv').config();
+const jwt = require('jsonwebtoken');
+const jwtPassword = process.env.JWT_SECRET;
 
 const router = Router();
 
@@ -13,6 +16,19 @@ router.post("/sign-up", async (req, res) => {
   });
   res.status(200).json({ msg: "user created successfully" });
 });
+
+router.post("/sign-in", async(req, res)=>{
+    const {username, password} = req.body;
+    const user = await User.findOne({
+        username
+    });
+    if(user){
+        const token = jwt.sign({username}, jwtPassword);
+        res.status(200).json(token);
+    }else{
+        res.status(404).json({msg: 'user not found'});
+    }
+})
 
 router.get("/courses", userMiddleware, async (req, res) => {
   const courses = await Course.find({});
